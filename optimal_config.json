@@ -1,0 +1,33 @@
+{
+  "agent_weights": {
+    "momentum": 0.9716161614137144,
+    "mean_reversion": 1.2161438316069517,
+    "pattern": 1.463860705021796,
+    "volume": 0.6726240593178072,
+    "sentiment": 1.4301007041629505
+  },
+  "consensus": {
+    "consenso_fuerte": 0.6000000000000001,
+    "consenso_moderado": 0.35,
+    "min_agentes": 2,
+    "confianza_single": 0.7
+  },
+  "risk": {
+    "max_position_size": 0.15,
+    "stop_loss_pct": 0.015,
+    "take_profit_pct": 0.03,
+    "max_daily_trades": 10
+  },
+  "performance_metrics": {
+    "expected_sharpe": 1.9555623088007987,
+    "optimization_score": 0.9999999999999999,
+    "risk_metrics": {
+      "var_95": -0.02,
+      "sortino_ratio": 1.5,
+      "calmar_ratio": 2.0,
+      "risk_adjusted_return": 1.0
+    }
+  },
+  "optimized_at": "2025-07-06T02:19:31.562334",
+  "version": "1.0"
+}

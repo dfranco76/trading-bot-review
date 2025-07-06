@@ -1,0 +1,149 @@
+# practice_mode.py
+# Modo práctica para ver el análisis completo sin restricciones de horario
+
+import sys
+sys.path.insert(0, 'src')
+
+from config import SYMBOLS
+from sistema_multiagente import SistemaMultiAgente
+from risk_manager import RiskManager
+from datetime import datetime
+
+class ModoPractica:
+    def __init__(self):
+        print("\n" + "="*60)
+        print("🎮 MODO PRÁCTICA - Análisis sin restricciones")
+        print("="*60)
+        print("⚠️ Este modo es solo para aprender y practicar")
+        print("⚠️ NO ejecutará trades reales")
+        print("✅ Funciona en fin de semana y fuera de horario")
+        
+        # Crear sistema
+        print("\n⚙️ Inicializando sistema...")
+        self.risk_manager = RiskManager()
+        self.sistema = SistemaMultiAgente()
+        
+        # Modificar para no ejecutar trades reales
+        self.sistema.ejecutar_trade_profesional = self.simular_trade
+        
+        print("\n✅ Modo práctica listo")
+    
+    def simular_trade(self, decision):
+        """Simula un trade sin ejecutarlo"""
+        print(f"\n" + "="*50)
+        print(f"📝 [SIMULACIÓN DE TRADE]")
+        print(f"="*50)
+        
+        print(f"📊 Símbolo: {decision['symbol']}")
+        print(f"🎯 Decisión: {decision['decision']}")
+        print(f"💡 Tipo: {decision['tipo']}")
+        print(f"💪 Confianza: {decision['confidence']*100:.0f}%")
+        print(f"💵 Precio actual: ${decision['price']:.2f}")
+        
+        # Simular cálculos
+        capital = 200
+        tamano = 0.15 * decision['confidence']
+        cantidad = (capital * tamano) / decision['price']
+        
+        print(f"\n📈 Cálculos simulados:")
+        print(f"  • Tamaño posición: {tamano*100:.0f}% del capital")
+        print(f"  • Cantidad: {cantidad:.2f} acciones")
+        print(f"  • Capital usado: ${cantidad * decision['price']:.2f}")
+        
+        # Mostrar votos
+        print(f"\n👥 Votos de los agentes:")
+        buy_votes = sum(1 for v in decision['votos'] if v['action'] == 'BUY')
+        sell_votes = sum(1 for v in decision['votos'] if v['action'] == 'SELL')
+        hold_votes = sum(1 for v in decision['votos'] if v['action'] == 'HOLD')
+        print(f"  • BUY: {buy_votes} votos")
+        print(f"  • SELL: {sell_votes} votos")
+        print(f"  • HOLD: {hold_votes} votos")
+        
+        # Razones principales
+        print(f"\n📝 Razones principales:")
+        razones = [(v['agent'], v['reason'], v['confidence']) 
+                   for v in decision['votos'] 
+                   if v['action'] == decision['decision'] and v['reason']]
+        
+        for agent, reason, conf in sorted(razones, key=lambda x: x[2], reverse=True)[:3]:
+            print(f"  • {agent}: {reason} ({conf*100:.0f}%)")
+        
+        return True
+    
+    def ejecutar_analisis(self):
+        """Ejecuta el análisis completo"""
+        print(f"\n⏰ ANÁLISIS DE PRÁCTICA - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print("="*60)
+        
+        # Generar reporte de riesgo
+        print("\n📊 Estado actual del sistema:")
+        capital = self.risk_manager.get_capital_actual()
+        exposicion = self.risk_manager.calcular_exposicion_actual()
+        metricas = self.risk_manager.get_metricas_dia()
+        
+        print(f"  • Capital: ${capital:.2f}")
+        print(f"  • Exposición: {exposicion['exposicion_total_pct']*100:.1f}%")
+        print(f"  • Trades hoy: {metricas['trades_totales']}")
+        print(f"  • P&L del día: ${metricas['pnl_total']:.2f} ({metricas['pnl_porcentaje']:.1f}%)")
+        
+        # Ejecutar análisis de todos los símbolos
+        print(f"\n🔍 Analizando {len(SYMBOLS)} símbolos...")
+        self.sistema.execute_analysis(SYMBOLS)
+        
+        # Resumen
+        print(f"\n" + "="*60)
+        print("✅ Análisis de práctica completado")
+        print("\n💡 Observaciones:")
+        print("  • Este análisis muestra qué haría el bot en condiciones reales")
+        print("  • Los trades mostrados son simulaciones")
+        print("  • Úsalo para entender cómo funciona el sistema")
+        print("  • En trading real, respeta siempre los horarios de mercado")
+    
+    def mostrar_estadisticas(self):
+        """Muestra estadísticas educativas"""
+        print(f"\n📊 ESTADÍSTICAS EDUCATIVAS")
+        print("="*60)
+        
+        # Aquí podrías añadir estadísticas como:
+        # - Símbolos más volátiles
+        # - Agentes más activos
+        # - Tipos de señales más comunes
+        # etc.
+        
+        print("\n🎓 Consejos para trading real:")
+        print("  • Empieza con capital pequeño")
+        print("  • Monitorea los primeros días de cerca")
+        print("  • Ajusta los parámetros según resultados")
+        print("  • Nunca arriesgues más de lo que puedes perder")
+
+
+def main():
+    modo = ModoPractica()
+    
+    while True:
+        print(f"\n" + "="*60)
+        print("🎮 MODO PRÁCTICA - MENÚ")
+        print("="*60)
+        print("\n1. Ejecutar análisis completo")
+        print("2. Ver estadísticas del sistema")
+        print("3. Volver al menú principal")
+        
+        opcion = input("\nElige opción (1-3): ")
+        
+        if opcion == "1":
+            modo.ejecutar_analisis()
+            input("\nPresiona Enter para continuar...")
+            
+        elif opcion == "2":
+            modo.mostrar_estadisticas()
+            input("\nPresiona Enter para continuar...")
+            
+        elif opcion == "3":
+            break
+        
+        else:
+            print("\n❌ Opción no válida")
+
+
+if __name__ == "__main__":
+    main()
