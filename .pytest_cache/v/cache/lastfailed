@@ -1,0 +1,22 @@
+{
+  "tests/test_risk_management/test_risk_manager.py": true,
+  "tests/test_risk_management/test_risk_manager_simple.py::TestRiskManagerBasic::test_daily_loss_tracking": true,
+  "tests/test_risk_management/test_risk_manager_simple.py::TestRiskManagerBasic::test_position_size_calculation": true,
+  "tests/test_risk_management/test_risk_manager_simple.py::TestRiskManagerBasic::test_risk_manager_creation": true,
+  "tests/test_risk_management/test_risk_manager_simple.py::TestRiskManagerBasic::test_stop_loss_calculation": true,
+  "tests/test_risk_management/test_risk_manager_simple.py::TestRiskManagerBasic::test_trade_validation": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_ajustar_limites_dinamicamente": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_calcular_correlacion_aproximada": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_calcular_var_historico": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_detectar_regimen_mercado_bear": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_detectar_regimen_mercado_bull": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_evaluar_trade_avanzado_aprobado": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_evaluar_trade_avanzado_rechazado_por_riesgo": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_generar_reporte_riesgo_avanzado": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_get_capital_actual": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_get_capital_actual_sin_datos": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_initialization": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_verificar_horario_avanzado": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestRiskManagerIntegrationScenarios::test_escenario_cambio_regimen_mercado": true,
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestRiskManagerIntegrationScenarios::test_escenario_volatilidad_extrema": true
+}

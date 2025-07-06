@@ -1,0 +1,23 @@
+[
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_ajustar_limites_dinamicamente",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_calcular_correlacion_aproximada",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_calcular_correlacion_real",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_calcular_var_historico",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_detectar_regimen_mercado_bear",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_detectar_regimen_mercado_bull",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_evaluar_trade_avanzado_aprobado",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_evaluar_trade_avanzado_rechazado_por_riesgo",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_generar_reporte_riesgo_avanzado",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_get_capital_actual",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_get_capital_actual_sin_datos",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_initialization",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_verificar_horario_avanzado",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestRiskManagerIntegrationScenarios::test_escenario_cambio_regimen_mercado",
+  "tests/test_risk_management/test_enhanced_risk_manager.py::TestRiskManagerIntegrationScenarios::test_escenario_volatilidad_extrema",
+  "tests/test_risk_management/test_risk_manager_simple.py::TestRiskManagerBasic::test_daily_loss_tracking",
+  "tests/test_risk_management/test_risk_manager_simple.py::TestRiskManagerBasic::test_position_size_calculation",
+  "tests/test_risk_management/test_risk_manager_simple.py::TestRiskManagerBasic::test_risk_manager_creation",
+  "tests/test_risk_management/test_risk_manager_simple.py::TestRiskManagerBasic::test_stop_loss_calculation",
+  "tests/test_risk_management/test_risk_manager_simple.py::TestRiskManagerBasic::test_trade_validation",
+  "tests/test_risk_management/test_risk_manager_simple.py::TestRiskManagerIntegration::test_risk_flow"
+]
