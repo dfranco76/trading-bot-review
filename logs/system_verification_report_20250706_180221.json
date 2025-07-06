@@ -1,0 +1,75 @@
+{
+  "timestamp": "2025-07-06T18:02:21.756555",
+  "project_root": "C:\\Users\\david\\Repository\\trading-bot",
+  "imports": {
+    "yfinance": true,
+    "pandas": true,
+    "numpy": true,
+    "ta": true,
+    "scikit-learn": true,
+    "schedule": true
+  },
+  "missing_files": {},
+  "components": [
+    {
+      "component": "AgenteMomentum",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "AgenteMeanReversion",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "AgentePatternRecognition",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "AgenteVolumeMomentum",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "SistemaMultiAgente",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "EnhancedRiskManager",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "ClaudeMentor",
+      "status": "fail",
+      "error": "TypeError: ClaudeMentor.__init__() missing 1 required positional argument: 'api_key'",
+      "details": {}
+    }
+  ]
+}

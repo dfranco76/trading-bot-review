@@ -1,0 +1,102 @@
+{
+  "timestamp": "2025-07-06T20:31:58.233729",
+  "project_root": "C:\\Users\\david\\Repository\\trading-bot",
+  "imports": {
+    "yfinance": true,
+    "pandas": true,
+    "numpy": true,
+    "ta": true,
+    "scikit-learn": true,
+    "schedule": true
+  },
+  "missing_files": {},
+  "components": [
+    {
+      "component": "AgenteMomentum",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "AgenteMeanReversion",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "AgentePatternRecognition",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "AgenteVolumeMomentum",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "AgenteSentiment",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "MLPredictionSystem",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "PortfolioOptimizationSystem",
+      "status": "fail",
+      "error": "Attribute error: Module portfolio_optimization_system has no class PortfolioOptimizationSystem",
+      "details": {}
+    },
+    {
+      "component": "SistemaMultiAgente",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "EnhancedRiskManager",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    },
+    {
+      "component": "ClaudeMentor",
+      "status": "pass",
+      "error": null,
+      "details": {
+        "import": "success",
+        "instantiation": "success"
+      }
+    }
+  ]
+}

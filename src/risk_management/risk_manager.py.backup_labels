@@ -316,7 +316,7 @@ class EnhancedRiskManager:
         total_adjustment = max(0.4, min(1.2, total_adjustment))
         
         # Actualizar límites
-        self.limits['max_position_size'] = self.base_limits.get('max_exposicion_simbolo', 0.1) * total_adjustment
+        self.limits['max_position_size'] = self.base_limits['max_exposicion_simbolo'] * total_adjustment
         self.limits['max_trades_dia'] = int(self.base_limits['max_trades_dia'] * total_adjustment)
         self.limits['max_exposicion'] = self.base_limits['max_exposicion'] * min(total_adjustment, 1.0)
     
@@ -521,7 +521,7 @@ class EnhancedRiskManager:
             return False, f"Posición muy pequeña después de ajustes: ${ajustes['cantidad_ajustada'] * precio:.2f}", ajustes
         
         # Tamaño máximo
-        valor_maximo = capital_actual * self.limits.get('max_position_size', 0.1)
+        valor_maximo = capital_actual * self.limits['max_position_size']
         if ajustes['cantidad_ajustada'] * precio > valor_maximo:
             ajustes['cantidad_ajustada'] = valor_maximo / precio
             ajustes['razones_ajuste'].append("Limitado por tamaño máximo de posición")
@@ -641,7 +641,7 @@ class EnhancedRiskManager:
         
         # Límites actuales
         print(f"\n📏 LÍMITES ACTUALES (AJUSTADOS):")
-        print(f"  • Max posición: {self.limits.get('max_position_size', 0.1)*100:.1f}%")
+        print(f"  • Max posición: {self.limits['max_position_size']*100:.1f}%")
         print(f"  • Max trades/día: {self.limits['max_trades_dia']}")
         print(f"  • Max exposición: {self.limits['max_exposicion']*100:.0f}%")
         

@@ -403,7 +403,7 @@ class TradingSystemTester:
         results = {'total': 0, 'passed': 0, 'failed': 0, 'details': []}
         
         try:
-            from ml_system_auto_loader import MLPredictionSystem
+            from strategies.ml_prediction_system import MLPredictionSystem
             ml_system = MLPredictionSystem()
             
             # Test 1: Feature engineering

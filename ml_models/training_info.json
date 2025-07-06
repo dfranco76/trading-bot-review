@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-07-06T21:16:59.616460",
+  "symbols": [
+    "AAPL",
+    "GOOGL",
+    "MSFT",
+    "AMZN",
+    "TSLA",
+    "META",
+    "NVDA",
+    "JPM",
+    "V",
+    "WMT"
+  ],
+  "total_samples": 4530,
+  "features": [
+    "Open",
+    "High",
+    "Low",
+    "Close",
+    "Volume",
+    "Returns",
+    "SMA_20",
+    "SMA_50",
+    "RSI",
+    "Volatility",
+    "MACD",
+    "MACD_signal",
+    "BB_width",
+    "BB_position",
+    "Volume_ratio"
+  ],
+  "feature_count": 15,
+  "class_balance": {
+    "class_0": 0.45055187637969096,
+    "class_1": 0.549448123620309
+  }
+}

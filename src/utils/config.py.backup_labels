@@ -1,13 +1,7 @@
+# src/config.py
 from dotenv import load_dotenv
 import os
 import json
-import logging
-
-logger = logging.getLogger(__name__)
-
-
-
-# src/config.py
 
 # Cargar variables de entorno
 load_dotenv()
@@ -90,7 +84,7 @@ SYMBOLS_CONSERVATIVE = ['AAPL', 'MSFT', 'GOOGL', 'V', 'MA']
 try:
     with open('optimal_config.json', 'r') as f:
         OPTIMAL_CONFIG = json.load(f)
-        logger.info("✅ Configuración optimizada cargada desde optimal_config.json")
+        print("✅ Configuración optimizada cargada desde optimal_config.json")
         
         # Aplicar pesos optimizados
         AGENT_CONFIGS = {
@@ -123,7 +117,7 @@ try:
         RISK_CONFIG = OPTIMAL_CONFIG['risk']
         
 except FileNotFoundError:
-    logger.warning("⚠️ No se encontró optimal_config.json - Usando configuración por defecto")
+    print("⚠️ No se encontró optimal_config.json - Usando configuración por defecto")
     
     # Configuración por defecto (mejorada)
     AGENT_CONFIGS = {

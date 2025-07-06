@@ -46,3 +46,11 @@ rich>=13.5.0
 # Optional: Visualization
 plotly>=5.16.0
 dash>=2.13.0
+
+# PyPortfolioOpt
+PyPortfolioOpt>=1.5.6
+
+# Dashboard
+flask
+psutil
+openpyxl

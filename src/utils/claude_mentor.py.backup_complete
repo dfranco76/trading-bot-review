@@ -6,38 +6,15 @@ from typing import Dict, List, Optional
 import time
 
 class ClaudeMentor:
-    """Mentor IA usando Claude API"""
-    
-    def __init__(self, api_key=None):
-        """
-        Inicializa ClaudeMentor
-        Args:
-            api_key: API key de Anthropic (opcional, se busca en env si no se proporciona)
-        """
-        import os
-        from dotenv import load_dotenv
+    def __init__(self, api_key: str):
+        """Inicializa el mentor Claude"""
+        self.client = Anthropic(api_key=api_key)
+        # Usar claude-3-sonnet-20240229 que es más económico
+        self.model = "claude-3-sonnet-20240229"
+        self.max_retries = 3
+        self.retry_delay = 2
+        print("🧠 Claude Mentor iniciado")
         
-        # Cargar variables de entorno
-        load_dotenv()
-        
-        # Usar api_key proporcionada o buscar en entorno
-        if api_key is None:
-            api_key = os.getenv('ANTHROPIC_API_KEY')
-            
-        if not api_key:
-            raise ValueError("No se encontró ANTHROPIC_API_KEY. Configúrala en .env o pásala como parámetro")
-            
-        self.api_key = api_key
-        
-        # Inicializar el cliente de Anthropic
-        try:
-            from anthropic import Anthropic
-            self.client = Anthropic(api_key=self.api_key)
-            print("🧠 Claude Mentor iniciado correctamente")
-        except ImportError:
-            raise ImportError("Instala anthropic: pip install anthropic")
-        except Exception as e:
-            raise Exception(f"Error iniciando Claude Mentor: {e}")
     def analizar_decision_compleja(self, context: Dict) -> Dict:
         """Consulta a Claude para decisiones importantes"""
         

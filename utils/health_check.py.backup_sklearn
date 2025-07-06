@@ -108,7 +108,7 @@ class HealthCheck:
             'numpy',
             'ta',
             'alpaca_trade_api',
-            'sklearn',
+            'scikit-learn',
             'schedule'
         ]
         

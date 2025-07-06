@@ -154,28 +154,10 @@ class SystemVerifier:
                 'test_method': 'analyze'
             },
             {
-                'name': 'AgenteSentiment',
-                'module': 'agente_sentiment',
-                'class': 'AgenteSentiment',
-                'test_method': 'analyze'
-            },
-            {
-                'name': 'MLPredictionSystem',
-                'module': 'ml_prediction_system',
-                'class': 'MLPredictionSystem',
-                'test_method': None  # No tiene analyze
-            },
-            {
-                'name': 'PortfolioOptimizationSystem',
-                'module': 'portfolio_optimization_system',
-                'class': 'PortfolioOptimizationSystem',
-                'test_method': None  # No tiene analyze
-            },
-            {
                 'name': 'SistemaMultiAgente',
                 'module': 'sistema_multiagente',
                 'class': 'SistemaMultiAgente',
-                'test_method': None  # Este coordina a todos
+                'test_method': None  # This one might not have a simple analyze method
             }
         ]
         

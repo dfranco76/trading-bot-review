@@ -18,7 +18,7 @@ class SafeTradingWrapper:
         """
         self.modo = modo
         self.sistema = SistemaMultiAgente()
-        self.risk_manager = EnhancedEnhancedRiskManager()
+        self.risk_manager = EnhancedRiskManager()
         
         # Límites según modo
         self.limites = {

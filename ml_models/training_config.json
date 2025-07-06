@@ -1,0 +1,28 @@
+{
+  "training_date": "2025-07-06T21:28:45.547137",
+  "feature_columns": [
+    "Open",
+    "High",
+    "Low",
+    "Close",
+    "Volume",
+    "Returns",
+    "SMA_20",
+    "SMA_50",
+    "RSI",
+    "Volatility",
+    "MACD",
+    "MACD_signal",
+    "BB_width",
+    "BB_position",
+    "Volume_ratio"
+  ],
+  "models_trained": [
+    "logistic",
+    "random_forest",
+    "gradient_boost",
+    "neural_net",
+    "lightgbm"
+  ],
+  "saved_files": 6
+}

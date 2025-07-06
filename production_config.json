@@ -1,0 +1,23 @@
+{
+    "trading": {
+        "symbols": [
+            "AAPL",
+            "GOOGL",
+            "MSFT"
+        ],
+        "position_size": 0.1,
+        "max_positions": 3,
+        "stop_loss_percentage": 0.02,
+        "take_profit_percentage": 0.03,
+        "paper_trading": true,
+        "check_interval_seconds": 300
+    },
+    "risk_management": {
+        "max_daily_loss": 0.05,
+        "max_portfolio_risk": 0.2
+    },
+    "alerts": {
+        "email_enabled": false,
+        "email": "tu-email@example.com"
+    }
+}

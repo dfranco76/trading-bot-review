@@ -1,0 +1,108 @@
+{
+  "selected_features": [
+    "Open",
+    "High",
+    "Low",
+    "Close",
+    "Volume",
+    "Returns",
+    "SMA_20",
+    "SMA_50",
+    "RSI",
+    "Volatility",
+    "MACD",
+    "MACD_signal",
+    "BB_width",
+    "BB_position",
+    "Volume_ratio"
+  ],
+  "performance_metrics": {
+    "logistic": {
+      "cv_accuracy": 0.4819023569023569,
+      "cv_std": 0.01732248790173122,
+      "trained_samples": 3171
+    },
+    "random_forest": {
+      "cv_accuracy": 0.5084175084175084,
+      "cv_std": 0.01679287655156564,
+      "trained_samples": 3171
+    },
+    "gradient_boost": {
+      "cv_accuracy": 0.5042087542087542,
+      "cv_std": 0.024749478834998565,
+      "trained_samples": 3171
+    },
+    "neural_net": {
+      "cv_accuracy": 0.5,
+      "cv_std": 0.014615955685341181,
+      "trained_samples": 3171
+    },
+    "lightgbm": {
+      "cv_accuracy": 0.5063131313131314,
+      "cv_std": 0.016591248606420066,
+      "trained_samples": 3171
+    }
+  },
+  "feature_importance": {
+    "random_forest": {
+      "Volume_ratio": 0.09042355855751086,
+      "BB_position": 0.08163705954489657,
+      "RSI": 0.08027464289074691,
+      "Volume": 0.07303609530511429,
+      "Returns": 0.07113202409127932,
+      "MACD": 0.06912671166274999,
+      "Volatility": 0.06780215804881978,
+      "BB_width": 0.06753911439225767,
+      "SMA_20": 0.06297635624035146,
+      "MACD_signal": 0.06144548508786161,
+      "Close": 0.05926412315561468,
+      "SMA_50": 0.057532486123208666,
+      "Open": 0.055043548746947626,
+      "Low": 0.05487278293629313,
+      "High": 0.04789385321634748
+    },
+    "gradient_boost": {
+      "BB_position": 0.10562519680821127,
+      "Volume_ratio": 0.10288111729853305,
+      "Volume": 0.09866031469806737,
+      "Returns": 0.09419855792858091,
+      "BB_width": 0.08895767349213501,
+      "RSI": 0.08724081785066853,
+      "MACD_signal": 0.08188643610037939,
+      "Volatility": 0.07235179019076518,
+      "MACD": 0.05750676688815844,
+      "SMA_20": 0.05325926042541098,
+      "SMA_50": 0.04806742743765332,
+      "Open": 0.03903446449029137,
+      "Low": 0.026965899904665316,
+      "Close": 0.024982556665363326,
+      "High": 0.01838171982111657
+    },
+    "lightgbm": {
+      "Returns": 336,
+      "Volume_ratio": 335,
+      "BB_position": 312,
+      "BB_width": 291,
+      "RSI": 257,
+      "Volume": 244,
+      "Volatility": 227,
+      "MACD_signal": 227,
+      "MACD": 215,
+      "SMA_50": 120,
+      "SMA_20": 118,
+      "Open": 116,
+      "Close": 71,
+      "High": 68,
+      "Low": 63
+    }
+  },
+  "model_configs": {
+    "logistic": 0.15,
+    "random_forest": 0.2,
+    "gradient_boost": 0.2,
+    "neural_net": 0.15,
+    "xgboost": 0.15,
+    "lightgbm": 0.15
+  },
+  "trained_date": "2025-07-06T21:28:45.614997"
+}

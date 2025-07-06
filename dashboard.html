@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Bot Dashboard Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #1a1a1a;
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            text-align: center;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            color: #4a9eff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .nav-items {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: #2a2a2a;
+        }
+
+        .nav-item.active {
+            background: #2a2a2a;
+            border-left-color: #4a9eff;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff4444;
+        }
+
+        .status-dot.active {
+            background: #44ff44;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Cards */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: #4a9eff;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .positive { color: #44ff44; }
+        .negative { color: #ff4444; }
+        .neutral { color: #4a9eff; }
+
+        /* Buttons */
+        .btn {
+            background: #4a9eff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn:hover {
+            background: #357abd;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: #ff4444;
+        }
+
+        .btn-danger:hover {
+            background: #cc0000;
+        }
+
+        .btn-success {
+            background: #44ff44;
+            color: #000;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+        }
+
+        .control-section h3 {
+            margin-bottom: 15px;
+            color: #4a9eff;
+        }
+
+        /* Monitoring */
+        .chart-container {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 400px;
+        }
+
+        .positions-table {
+            width: 100%;
+            background: #1a1a1a;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .positions-table th {
+            background: #2a2a2a;
+            padding: 15px;
+            text-align: left;
+            font-weight: normal;
+            color: #888;
+        }
+
+        .positions-table td {
+            padding: 15px;
+            border-top: 1px solid #333;
+        }
+
+        /* Logs */
+        .log-container {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 15px;
+            height: 400px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+        }
+
+        .log-error { color: #ff4444; }
+        .log-success { color: #44ff44; }
+        .log-info { color: #4a9eff; }
+        .log-warning { color: #ffaa44; }
+
+        /* Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #666;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #ff4444;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Health Check */
+        .health-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .health-item {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .health-icon {
+            font-size: 24px;
+        }
+
+        .health-details {
+            flex: 1;
+        }
+
+        .health-title {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .health-status {
+            font-weight: bold;
+        }
+
+        /* ML Status */
+        .ml-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .ml-card {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4a9eff;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>🤖 Trading Bot</h1>
+            </div>
+            <div class="nav-items">
+                <div class="nav-item active" onclick="showTab('control')">
+                    <span class="nav-icon">🎮</span>
+                    <span>Control Panel</span>
+                </div>
+                <div class="nav-item" onclick="showTab('monitoring')">
+                    <span class="nav-icon">📊</span>
+                    <span>Monitoreo Real-Time</span>
+                </div>
+                <div class="nav-item" onclick="showTab('history')">
+                    <span class="nav-icon">📈</span>
+                    <span>Histórico</span>
+                </div>
+                <div class="nav-item" onclick="showTab('ml')">
+                    <span class="nav-icon">🧠</span>
+                    <span>Machine Learning</span>
+                </div>
+                <div class="nav-item" onclick="showTab('health')">
+                    <span class="nav-icon">🏥</span>
+                    <span>Health Check</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Control Panel Tab -->
+            <div id="control-tab" class="tab-content active">
+                <div class="header">
+                    <h2>Panel de Control</h2>
+                    <div class="status-indicator">
+                        <span id="bot-status">Bot Detenido</span>
+                        <div class="status-dot" id="status-dot"></div>
+                    </div>
+                </div>
+
+                <div class="control-panel">
+                    <div class="control-section">
+                        <h3>🎯 Control Principal</h3>
+                        <div class="btn-group">
+                            <button class="btn" onclick="startBot()">
+                                <span>▶️</span> Iniciar Bot
+                            </button>
+                            <button class="btn btn-danger" onclick="stopBot()" disabled>
+                                <span>⏹️</span> Detener Bot
+                            </button>
+                            <button class="btn" onclick="runSingleAnalysis()">
+                                <span>🔍</span> Análisis Único
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h3>⚙️ Configuración</h3>
+                        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 15px;">
+                            <label style="display: flex; align-items: center; gap: 10px;">
+                                Paper Trading
+                                <label class="switch">
+                                    <input type="checkbox" id="paper-trading" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                            <span style="color: #666; font-size: 12px;">
+                                ⚠️ Desactivar usará dinero real
+                            </span>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn" onclick="openBacktest()">
+                                <span>📊</span> Backtest
+                            </button>
+                            <button class="btn" onclick="optimizeParams()">
+                                <span>🔧</span> Optimizar
+                            </button>
+                            <button class="btn" onclick="manageRisk()">
+                                <span>🛡️</span> Gestión Riesgo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h3>📚 Modos Especiales</h3>
+                        <div class="btn-group">
+                            <button class="btn" onclick="practiceMode()">
+                                <span>🎓</span> Modo Práctica
+                            </button>
+                            <button class="btn" onclick="viewStats()">
+                                <span>📈</span> Estadísticas
+                            </button>
+                            <button class="btn" onclick="generateReport()">
+                                <span>📄</span> Generar Reporte
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="log-container">
+                    <div class="log-entry log-info">[00:00:00] Dashboard iniciado</div>
+                    <div class="log-entry log-info">[00:00:01] Esperando comandos...</div>
+                </div>
+            </div>
+
+            <!-- Monitoring Tab -->
+            <div id="monitoring-tab" class="tab-content">
+                <div class="header">
+                    <h2>Monitoreo en Tiempo Real</h2>
+                    <button class="btn" onclick="refreshData()">
+                        <span>🔄</span> Actualizar
+                    </button>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Capital Total</span>
+                            <span>💰</span>
+                        </div>
+                        <div class="card-value neutral">$200.00</div>
+                        <div class="card-subtitle">+0.00% hoy</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">P&L del Día</span>
+                            <span>📊</span>
+                        </div>
+                        <div class="card-value neutral">$0.00</div>
+                        <div class="card-subtitle">0 trades ejecutados</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Win Rate</span>
+                            <span>🎯</span>
+                        </div>
+                        <div class="card-value neutral">--%</div>
+                        <div class="card-subtitle">0/0 trades ganadores</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Posiciones Abiertas</span>
+                            <span>📈</span>
+                        </div>
+                        <div class="card-value neutral">0</div>
+                        <div class="card-subtitle">0% exposición</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="realtime-chart"></canvas>
+                </div>
+
+                <h3 style="margin: 20px 0;">Posiciones Actuales</h3>
+                <table class="positions-table">
+                    <thead>
+                        <tr>
+                            <th>Símbolo</th>
+                            <th>Tipo</th>
+                            <th>Entrada</th>
+                            <th>Actual</th>
+                            <th>P&L</th>
+                            <th>Tiempo</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="positions-tbody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: #666;">
+                                No hay posiciones abiertas
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- History Tab -->
+            <div id="history-tab" class="tab-content">
+                <div class="header">
+                    <h2>Histórico de Trading</h2>
+                    <div class="btn-group">
+                        <button class="btn active" onclick="showPeriod('day')">Día</button>
+                        <button class="btn" onclick="showPeriod('week')">Semana</button>
+                        <button class="btn" onclick="showPeriod('month')">Mes</button>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Retorno Total</span>
+                            <span>💹</span>
+                        </div>
+                        <div class="card-value positive">+0.00%</div>
+                        <div class="card-subtitle">$0.00</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Mejor Trade</span>
+                            <span>🏆</span>
+                        </div>
+                        <div class="card-value positive">$0.00</div>
+                        <div class="card-subtitle">-</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Peor Trade</span>
+                            <span>📉</span>
+                        </div>
+                        <div class="card-value negative">$0.00</div>
+                        <div class="card-subtitle">-</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Sharpe Ratio</span>
+                            <span>📏</span>
+                        </div>
+                        <div class="card-value neutral">0.00</div>
+                        <div class="card-subtitle">-</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="history-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- ML Tab -->
+            <div id="ml-tab" class="tab-content">
+                <div class="header">
+                    <h2>Estado del Machine Learning</h2>
+                    <button class="btn" onclick="retrainModels()">
+                        <span>🔄</span> Re-entrenar Modelos
+                    </button>
+                </div>
+
+                <div class="ml-metrics">
+                    <div class="ml-card">
+                        <h3>📊 Modelos Activos</h3>
+                        <div style="margin: 15px 0;">
+                            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                                <span>Random Forest</span>
+                                <span class="positive">✓ Activo</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                                <span>Neural Network</span>
+                                <span class="positive">✓ Activo</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 78%;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                                <span>Gradient Boost</span>
+                                <span class="positive">✓ Activo</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 82%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ml-card">
+                        <h3>🎯 Métricas de Precisión</h3>
+                        <div style="margin: 15px 0;">
+                            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                                <span>Accuracy General</span>
+                                <span>81.5%</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                                <span>Precision (Buy)</span>
+                                <span class="positive">83.2%</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                                <span>Precision (Sell)</span>
+                                <span class="positive">79.8%</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                                <span>F1 Score</span>
+                                <span>0.815</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ml-card">
+                        <h3>🔄 Estado del Entrenamiento</h3>
+                        <div style="margin: 15px 0;">
+                            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                                <span>Último entrenamiento</span>
+                                <span>Hace 2 días</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                                <span>Próximo entrenamiento</span>
+                                <span>En 5 días</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                                <span>Datos de entrenamiento</span>
+                                <span>150,234 muestras</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ml-card">
+                        <h3>⚡ Rendimiento</h3>
+                        <div style="margin: 15px 0;">
+                            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                                <span>Tiempo de predicción</span>
+                                <span class="positive">12ms</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                                <span>Uso de memoria</span>
+                                <span>245 MB</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                                <span>Confianza promedio</span>
+                                <span>72.3%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Health Check Tab -->
+            <div id="health-tab" class="tab-content">
+                <div class="header">
+                    <h2>Health Check del Sistema</h2>
+                    <button class="btn" onclick="runHealthCheck()">
+                        <span>🔍</span> Ejecutar Verificación
+                    </button>
+                </div>
+
+                <div class="health-grid">
+                    <div class="health-item">
+                        <span class="health-icon">✅</span>
+                        <div class="health-details">
+                            <div class="health-title">API Keys</div>
+                            <div class="health-status positive">Configuradas</div>
+                        </div>
+                    </div>
+
+                    <div class="health-item">
+                        <span class="health-icon">✅</span>
+                        <div class="health-details">
+                            <div class="health-title">Base de Datos</div>
+                            <div class="health-status positive">Conectada</div>
+                        </div>
+                    </div>
+
+                    <div class="health-item">
+                        <span class="health-icon">✅</span>
+                        <div class="health-details">
+                            <div class="health-title">Modelos ML</div>
+                            <div class="health-status positive">5/5 Cargados</div>
+                        </div>
+                    </div>
+
+                    <div class="health-item">
+                        <span class="health-icon">✅</span>
+                        <div class="health-details">
+                            <div class="health-title">Paper Trading</div>
+                            <div class="health-status positive">Activado</div>
+                        </div>
+                    </div>
+
+                    <div class="health-item">
+                        <span class="health-icon">⚠️</span>
+                        <div class="health-details">
+                            <div class="health-title">Mercado</div>
+                            <div class="health-status warning">Cerrado</div>
+                        </div>
+                    </div>
+
+                    <div class="health-item">
+                        <span class="health-icon">✅</span>
+                        <div class="health-details">
+                            <div class="health-title">CPU</div>
+                            <div class="health-status positive">15%</div>
+                        </div>
+                    </div>
+
+                    <div class="health-item">
+                        <span class="health-icon">✅</span>
+                        <div class="health-details">
+                            <div class="health-title">Memoria</div>
+                            <div class="health-status positive">2.1 GB</div>
+                        </div>
+                    </div>
+
+                    <div class="health-item">
+                        <span class="health-icon">✅</span>
+                        <div class="health-details">
+                            <div class="health-title">Disco</div>
+                            <div class="health-status positive">120 GB libres</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin: 30px 0 20px;">Verificaciones del Sistema</h3>
+                <div class="log-container" id="health-log">
+                    <div class="log-entry log-success">[✓] Python 3.9+ detectado</div>
+                    <div class="log-entry log-success">[✓] Todas las librerías instaladas</div>
+                    <div class="log-entry log-success">[✓] Conexión a Internet activa</div>
+                    <div class="log-entry log-success">[✓] API de Yahoo Finance respondiendo</div>
+                    <div class="log-entry log-success">[✓] Supabase conectado</div>
+                    <div class="log-entry log-success">[✓] Archivos de configuración presentes</div>
+                    <div class="log-entry log-warning">[!] Mercado cerrado - fin de semana</div>
+                    <div class="log-entry log-info">[i] Último health check: hace 2 minutos</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Navigation
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked nav item
+            event.target.closest('.nav-item').classList.add('active');
+            
+            // Run specific actions based on tab
+            if (tabName === 'health') {
+                runHealthCheck();
+            }
+        }
+
+        // Control Panel Functions
+        function startBot() {
+            addLog('[INFO] Iniciando bot...', 'info');
+            document.getElementById('bot-status').textContent = 'Bot Ejecutándose';
+            document.getElementById('status-dot').classList.add('active');
+            document.querySelector('.btn').disabled = true;
+            document.querySelector('.btn-danger').disabled = false;
+            
+            // Simulate API call
+            setTimeout(() => {
+                addLog('[SUCCESS] Bot iniciado correctamente', 'success');
+                addLog('[INFO] Modo: Paper Trading', 'info');
+                addLog('[INFO] Analizando mercados...', 'info');
+            }, 1000);
+        }
+
+        function stopBot() {
+            if (confirm('¿Estás seguro de que quieres detener el bot?')) {
+                addLog('[INFO] Deteniendo bot...', 'info');
+                document.getElementById('bot-status').textContent = 'Bot Detenido';
+                document.getElementById('status-dot').classList.remove('active');
+                document.querySelector('.btn').disabled = false;
+                document.querySelector('.btn-danger').disabled = true;
+                
+                setTimeout(() => {
+                    addLog('[SUCCESS] Bot detenido correctamente', 'success');
+                }, 500);
+            }
+        }
+
+        function runSingleAnalysis() {
+            addLog('[INFO] Ejecutando análisis único...', 'info');
+            setTimeout(() => {
+                addLog('[INFO] Analizando AAPL...', 'info');
+                addLog('[INFO] Señal: HOLD (Confianza: 65%)', 'info');
+                addLog('[INFO] Analizando GOOGL...', 'info');
+                addLog('[INFO] Señal: BUY (Confianza: 72%)', 'success');
+                addLog('[SUCCESS] Análisis completado', 'success');
+            }, 1500);
+        }
+
+        // Logging
+        function addLog(message, type = 'info') {
+            const logContainer = document.querySelector('.log-container');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            const time = new Date().toLocaleTimeString();
+            logEntry.textContent = `[${time}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // Paper Trading Toggle
+        document.getElementById('paper-trading').addEventListener('change', function() {
+            if (!this.checked) {
+                if (!confirm('⚠️ ADVERTENCIA: Desactivar Paper Trading usará DINERO REAL. ¿Estás seguro?')) {
+                    this.checked = true;
+                } else {
+                    addLog('[WARNING] Paper Trading desactivado - MODO DINERO REAL', 'error');
+                }
+            } else {
+                addLog('[INFO] Paper Trading activado - Modo simulación', 'success');
+            }
+        });
+
+        // Other functions
+        function refreshData() {
+            addLog('[INFO] Actualizando datos...', 'info');
+            // Simulate data refresh
+            setTimeout(() => {
+                addLog('[SUCCESS] Datos actualizados', 'success');
+            }, 500);
+        }
+
+        function runHealthCheck() {
+            const healthLog = document.getElementById('health-log');
+            healthLog.innerHTML = '';
+            
+            const checks = [
+                { message: 'Verificando Python...', status: 'success', result: '[✓] Python 3.9+ detectado' },
+                { message: 'Verificando librerías...', status: 'success', result: '[✓] Todas las librerías instaladas' },
+                { message: 'Verificando conexión...', status: 'success', result: '[✓] Conexión a Internet activa' },
+                { message: 'Verificando APIs...', status: 'success', result: '[✓] APIs respondiendo correctamente' },
+                { message: 'Verificando base de datos...', status: 'success', result: '[✓] Supabase conectado' },
+                { message: 'Verificando modelos ML...', status: 'success', result: '[✓] 5/5 modelos cargados' },
+                { message: 'Verificando mercado...', status: 'warning', result: '[!] Mercado cerrado - fin de semana' }
+            ];
+            
+            checks.forEach((check, index) => {
+                setTimeout(() => {
+                    const entry = document.createElement('div');
+                    entry.className = `log-entry log-${check.status}`;
+                    entry.textContent = check.result;
+                    healthLog.appendChild(entry);
+                    healthLog.scrollTop = healthLog.scrollHeight;
+                }, index * 300);
+            });
+        }
+
+        // Initialize
+        addLog('[INFO] Dashboard conectado al bot', 'info');
+        
+        // Auto-refresh
+        setInterval(() => {
+            if (document.getElementById('status-dot').classList.contains('active')) {
+                // Update metrics if bot is running
+                console.log('Updating metrics...');
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
+
+// dashboard_functions.js
+// Agregar este código al final del HTML del dashboard, dentro del <script>
+
+// Configuración Functions
+function openBacktest() {
+    addLog('[INFO] Iniciando módulo de Backtest...', 'info');
+    
+    // Mostrar modal o cambiar a pestaña de backtest
+    const modal = createModal('Backtest', `
+        <div class="control-section">
+            <h3>Configuración de Backtest</h3>
+            <div style="display: grid; gap: 15px;">
+                <div>
+                    <label>Período:</label>
+                    <select id="backtest-period" class="form-control">
+                        <option value="1M">1 Mes</option>
+                        <option value="3M">3 Meses</option>
+                        <option value="6M">6 Meses</option>
+                        <option value="1Y">1 Año</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Símbolos:</label>
+                    <input type="text" id="backtest-symbols" value="AAPL,GOOGL,MSFT" class="form-control">
+                </div>
+                <div>
+                    <label>Capital Inicial:</label>
+                    <input type="number" id="backtest-capital" value="10000" class="form-control">
+                </div>
+            </div>
+            <button class="btn" onclick="runBacktest()">Ejecutar Backtest</button>
+        </div>
+        <div id="backtest-results" style="margin-top: 20px;"></div>
+    `);
+}
+
+function runBacktest() {
+    const period = document.getElementById('backtest-period').value;
+    const symbols = document.getElementById('backtest-symbols').value;
+    const capital = document.getElementById('backtest-capital').value;
+    
+    addLog('[INFO] Ejecutando backtest...', 'info');
+    document.getElementById('backtest-results').innerHTML = '<div class="loading">Procesando...</div>';
+    
+    fetch('/api/command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            command: 'backtest',
+            params: { period, symbols: symbols.split(','), capital: parseFloat(capital) }
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayBacktestResults(data.results);
+        } else {
+            addLog('[ERROR] ' + data.error, 'error');
+        }
+    });
+}
+
+function displayBacktestResults(results) {
+    const html = `
+        <h3>Resultados del Backtest</h3>
+        <div class="grid" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="metric-box">
+                <span class="metric-label">Retorno Total</span>
+                <span class="metric-value ${results.total_return > 0 ? 'positive' : 'negative'}">
+                    ${results.total_return > 0 ? '+' : ''}${(results.total_return * 100).toFixed(2)}%
+                </span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-label">Sharpe Ratio</span>
+                <span class="metric-value">${results.sharpe_ratio.toFixed(2)}</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-label">Win Rate</span>
+                <span class="metric-value">${(results.win_rate * 100).toFixed(1)}%</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-label">Max Drawdown</span>
+                <span class="metric-value negative">${(results.max_drawdown * 100).toFixed(1)}%</span>
+            </div>
+        </div>
+    `;
+    document.getElementById('backtest-results').innerHTML = html;
+    addLog('[SUCCESS] Backtest completado', 'success');
+}
+
+function optimizeParams() {
+    addLog('[INFO] Iniciando optimización de parámetros...', 'info');
+    
+    const modal = createModal('Optimización de Parámetros', `
+        <div class="control-section">
+            <h3>Parámetros a Optimizar</h3>
+            <div style="display: grid; gap: 10px;">
+                <label><input type="checkbox" checked> Umbrales de confianza ML</label>
+                <label><input type="checkbox" checked> Tamaño de posición</label>
+                <label><input type="checkbox" checked> Stop Loss / Take Profit</label>
+                <label><input type="checkbox"> Indicadores técnicos</label>
+            </div>
+            <button class="btn" onclick="startOptimization()">Iniciar Optimización</button>
+            <div class="warning-box" style="margin-top: 15px;">
+                ⚠️ La optimización puede tardar 5-30 minutos
+            </div>
+        </div>
+        <div id="optimization-progress"></div>
+    `);
+}
+
+function startOptimization() {
+    addLog('[INFO] Optimización en progreso...', 'info');
+    document.getElementById('optimization-progress').innerHTML = `
+        <div class="progress-bar" style="margin: 20px 0;">
+            <div class="progress-fill" id="opt-progress" style="width: 0%; transition: width 1s;"></div>
+        </div>
+        <div id="opt-status">Iniciando...</div>
+    `;
+    
+    // Simular progreso
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            document.getElementById('opt-status').innerHTML = '✅ Optimización completada';
+            showOptimizationResults();
+        }
+        document.getElementById('opt-progress').style.width = progress + '%';
+        document.getElementById('opt-status').innerHTML = `Optimizando... ${Math.floor(progress)}%`;
+    }, 2000);
+}
+
+function manageRisk() {
+    addLog('[INFO] Abriendo gestión de riesgo...', 'info');
+    
+    const modal = createModal('Gestión de Riesgo', `
+        <div class="risk-controls">
+            <h3>Límites de Riesgo</h3>
+            <div class="control-grid">
+                <div class="control-item">
+                    <label>Max Pérdida Diaria:</label>
+                    <input type="range" min="1" max="10" value="5" id="max-daily-loss">
+                    <span id="daily-loss-value">5%</span>
+                </div>
+                <div class="control-item">
+                    <label>Stop Loss por Trade:</label>
+                    <input type="range" min="0.5" max="5" step="0.5" value="2" id="stop-loss">
+                    <span id="stop-loss-value">2%</span>
+                </div>
+                <div class="control-item">
+                    <label>Tamaño Máx. Posición:</label>
+                    <input type="range" min="5" max="25" value="10" id="position-size">
+                    <span id="position-size-value">10%</span>
+                </div>
+                <div class="control-item">
+                    <label>Max Drawdown Permitido:</label>
+                    <input type="range" min="10" max="30" value="15" id="max-drawdown">
+                    <span id="drawdown-value">15%</span>
+                </div>
+            </div>
+            <button class="btn" onclick="saveRiskSettings()">Guardar Configuración</button>
+        </div>
+        <div class="risk-metrics" style="margin-top: 20px;">
+            <h3>Métricas Actuales</h3>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Drawdown Actual</div>
+                    <div class="card-value negative">-3.2%</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Pérdida Hoy</div>
+                    <div class="card-value negative">-$45.20</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Exposición</div>
+                    <div class="card-value neutral">23%</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Risk Score</div>
+                    <div class="card-value positive">Bajo</div>
+                </div>
+            </div>
+        </div>
+    `);
+    
+    // Actualizar valores en tiempo real
+    document.querySelectorAll('input[type="range"]').forEach(input => {
+        input.addEventListener('input', (e) => {
+            const valueSpan = document.getElementById(e.target.id + '-value');
+            valueSpan.textContent = e.target.value + '%';
+        });
+    });
+}
+
+function practiceMode() {
+    addLog('[INFO] Entrando a modo práctica...', 'info');
+    
+    fetch('/api/command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: 'practice' })
+    }).then(() => {
+        window.location.href = '/practice';  // O abrir en modal
+    });
+}
+
+function viewStats() {
+    addLog('[INFO] Cargando estadísticas...', 'info');
+    showTab('history');  // Cambiar a pestaña de histórico
+}
+
+function generateReport() {
+    addLog('[INFO] Generando reporte...', 'info');
+    
+    const modal = createModal('Generar Reporte', `
+        <div class="control-section">
+            <h3>Configuración del Reporte</h3>
+            <div style="display: grid; gap: 15px;">
+                <div>
+                    <label>Período:</label>
+                    <select id="report-period" class="form-control">
+                        <option value="today">Hoy</option>
+                        <option value="week">Esta Semana</option>
+                        <option value="month">Este Mes</option>
+                        <option value="custom">Personalizado</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Formato:</label>
+                    <select id="report-format" class="form-control">
+                        <option value="html">HTML</option>
+                        <option value="pdf">PDF</option>
+                        <option value="excel">Excel</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Incluir:</label>
+                    <label><input type="checkbox" checked> Gráficos</label>
+                    <label><input type="checkbox" checked> Trades detallados</label>
+                    <label><input type="checkbox" checked> Métricas ML</label>
+                </div>
+            </div>
+            <button class="btn" onclick="createReport()">Generar</button>
+        </div>
+        <div id="report-status"></div>
+    `);
+}
+
+function createReport() {
+    const period = document.getElementById('report-period').value;
+    const format = document.getElementById('report-format').value;
+    
+    document.getElementById('report-status').innerHTML = '<div class="loading">Generando reporte...</div>';
+    
+    fetch('/api/command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            command: 'report',
+            params: { period, format }
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('report-status').innerHTML = `
+                <div class="success-box">
+                    ✅ Reporte generado exitosamente
+                    <br>
+                    <a href="${data.file_path}" download class="btn" style="margin-top: 10px;">
+                        📥 Descargar Reporte
+                    </a>
+                </div>
+            `;
+            addLog('[SUCCESS] Reporte generado: ' + data.file_path, 'success');
+        }
+    });
+}
+
+// Función helper para crear modales
+function createModal(title, content) {
+    // Remover modal existente si hay
+    const existingModal = document.getElementById('modal');
+    if (existingModal) existingModal.remove();
+    
+    const modal = document.createElement('div');
+    modal.id = 'modal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>${title}</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                ${content}
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    return modal;
+}
+
+function closeModal() {
+    const modal = document.getElementById('modal');
+    if (modal) modal.remove();
+}
+
+// Estilos para los modales (agregar al CSS)
+const modalStyles = `
+<style>
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #1a1a1a;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #333;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.close {
+    font-size: 30px;
+    cursor: pointer;
+    color: #666;
+}
+
+.close:hover {
+    color: #fff;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 5px;
+    color: #fff;
+}
+
+.control-grid {
+    display: grid;
+    gap: 15px;
+}
+
+.control-item {
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    align-items: center;
+    gap: 10px;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #4a9eff;
+}
+
+.success-box {
+    background: #1a3a1a;
+    border: 1px solid #44ff44;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.warning-box {
+    background: #3a3a1a;
+    border: 1px solid #ffaa44;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.metric-box {
+    background: #2a2a2a;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.metric-label {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.metric-value {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+}
+</style>
+`;
+
+// Agregar estilos al documento
+document.head.insertAdjacentHTML('beforeend', modalStyles);

@@ -132,15 +132,11 @@ def main():
         
         if opcion == "1":
             modo.ejecutar_analisis()
-            user_input = input("\nPresiona Enter para continuar (q para salir)...")
-            if user_input.lower() == "q":
-                break
+            input("\nPresiona Enter para continuar...")
             
         elif opcion == "2":
             modo.mostrar_estadisticas()
-            user_input = input("\nPresiona Enter para continuar (q para salir)...")
-            if user_input.lower() == "q":
-                break
+            input("\nPresiona Enter para continuar...")
             
         elif opcion == "3":
             break

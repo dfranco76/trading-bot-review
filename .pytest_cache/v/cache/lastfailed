@@ -14,8 +14,6 @@
   "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_evaluar_trade_avanzado_rechazado_por_riesgo": true,
   "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_generar_reporte_riesgo_avanzado": true,
   "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_get_capital_actual": true,
-  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_get_capital_actual_sin_datos": true,
-  "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_initialization": true,
   "tests/test_risk_management/test_enhanced_risk_manager.py::TestEnhancedRiskManager::test_verificar_horario_avanzado": true,
   "tests/test_risk_management/test_enhanced_risk_manager.py::TestRiskManagerIntegrationScenarios::test_escenario_cambio_regimen_mercado": true,
   "tests/test_risk_management/test_enhanced_risk_manager.py::TestRiskManagerIntegrationScenarios::test_escenario_volatilidad_extrema": true,
