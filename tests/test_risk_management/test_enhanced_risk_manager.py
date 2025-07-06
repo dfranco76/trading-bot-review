@@ -1,306 +1,425 @@
-# tests/test_risk_management/test_enhanced_risk_manager.py
-"""
-Tests para EnhancedRiskManager con sus métodos reales
-"""
 import unittest
 from unittest.mock import Mock, patch, MagicMock
+from datetime import datetime, timedelta
 import sys
 import os
-import pandas as pd
-import numpy as np
-from datetime import datetime, time
 
-# Mock dependencies
-sys.modules['utils'] = MagicMock()
-sys.modules['utils.config'] = MagicMock()
-sys.modules['supabase'] = MagicMock()
-sys.modules['yfinance'] = MagicMock()
+# Configurar el path para importar desde src
+current_file_path = os.path.abspath(__file__)
+current_dir = os.path.dirname(current_file_path)
+tests_dir = os.path.dirname(current_dir)
+project_root = os.path.dirname(tests_dir)
+src_path = os.path.join(project_root, 'src')
 
-# Configure mocks
-sys.modules['utils.config'].SUPABASE_URL = 'http://mock-url'
-sys.modules['utils.config'].SUPABASE_KEY = 'mock-key'
+# Añadir múltiples paths posibles
+paths_to_add = [
+    src_path,
+    project_root,
+    os.path.join(project_root, 'src'),
+    r'C:\Users\david\Repository\trading-bot\src',  # Path absoluto como fallback
+]
 
-# Add paths
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'src'))
+for path in paths_to_add:
+    if os.path.exists(path) and path not in sys.path:
+        sys.path.insert(0, path)
+        print(f"Added to path: {path}")
+
+# Intentar importar con manejo de errores detallado
+try:
+    from risk_manager import RiskManager
+    print("✓ Successfully imported RiskManager")
+except ImportError as e:
+    print(f"Failed to import RiskManager: {e}")
+    print(f"Current working directory: {os.getcwd()}")
+    print(f"Python path: {sys.path[:5]}")
+    
+    # Intentar encontrar risk_manager.py
+    for path in sys.path[:5]:
+        risk_manager_path = os.path.join(path, 'risk_manager.py')
+        if os.path.exists(risk_manager_path):
+            print(f"Found risk_manager.py at: {risk_manager_path}")
+            break
+    else:
+        print("risk_manager.py not found in any path")
+    
+    # Re-lanzar el error
+    raise
 
 
-class TestEnhancedRiskManager(unittest.TestCase):
-    """Tests para los métodos reales de EnhancedRiskManager"""
+class TestRiskManager(unittest.TestCase):
+    """Tests para el Risk Manager real del proyecto"""
     
     def setUp(self):
-        """Setup para cada test"""
-        # Mock supabase client
-        self.mock_supabase = MagicMock()
-        sys.modules['supabase'].create_client.return_value = self.mock_supabase
+        """Configuración inicial para cada test"""
+        # Mock de Supabase
+        self.mock_supabase = Mock()
         
-        # Mock yfinance
-        self.mock_yf = sys.modules['yfinance']
+        # Patch del cliente de Supabase
+        self.patcher = patch('risk_manager.supabase', self.mock_supabase)
+        self.patcher.start()
         
-        # Default mock responses
-        self.mock_supabase.table().select().execute.return_value.data = []
-        self.mock_supabase.table().insert().execute.return_value = None
+        # Configurar respuesta por defecto para capital
+        self.mock_supabase.table.return_value.select.return_value.execute.return_value.data = [
+            {'capital': 200}
+        ]
         
-        # Import after mocks
-        from risk_management.risk_manager import EnhancedRiskManager
-        self.risk_manager = EnhancedRiskManager()
-        
-    def test_initialization(self):
-        """Test que el risk manager se inicializa correctamente"""
-        self.assertIsNotNone(self.risk_manager)
-        # Verificar que detectó régimen de mercado
-        self.assertIn(self.risk_manager.market_regime, ['bull', 'bear', 'neutral'])
-        
-    def test_get_capital_actual(self):
-        """Test obtención del capital actual"""
-        # Mock respuesta de la base de datos
-        self.mock_supabase.table().select().order().limit().execute.return_value.data = [
-            {'balance': 50000.0}
+        # Crear instancia del Risk Manager
+        self.risk_manager = RiskManager(capital_inicial=200)
+    
+    def tearDown(self):
+        """Limpieza después de cada test"""
+        self.patcher.stop()
+    
+    # ===== TESTS DE INICIALIZACIÓN =====
+    def test_initialization_values(self):
+        """Test que los valores se inicializan correctamente"""
+        self.assertEqual(self.risk_manager.capital_inicial, 200)
+        self.assertEqual(self.risk_manager.max_perdida_diaria, 0.05)
+        self.assertEqual(self.risk_manager.max_perdida_trade, 0.02)
+        self.assertEqual(self.risk_manager.max_drawdown_permitido, 0.10)
+        self.assertEqual(self.risk_manager.max_trades_dia, 15)
+        self.assertEqual(self.risk_manager.max_exposicion, 0.80)
+        self.assertEqual(self.risk_manager.max_exposicion_simbolo, 0.25)
+        self.assertEqual(self.risk_manager.horario_apertura, 15)
+        self.assertEqual(self.risk_manager.horario_cierre, 22)
+    
+    # ===== TESTS DE CAPITAL =====
+    def test_get_capital_actual_con_datos(self):
+        """Test obtener capital cuando hay datos en BD"""
+        # Configurar mock
+        self.mock_supabase.table.return_value.select.return_value.execute.return_value.data = [
+            {'capital': 250.50}
         ]
         
         capital = self.risk_manager.get_capital_actual()
         
-        self.assertEqual(capital, 50000.0)
-        # Verificar que se llamó a la base de datos correctamente
-        self.mock_supabase.table().select.assert_called_with('balance')
-        
+        self.assertEqual(capital, 250.50)
+        self.mock_supabase.table.assert_called_with('bot_status')
+    
     def test_get_capital_actual_sin_datos(self):
-        """Test cuando no hay datos de capital"""
-        # Mock respuesta vacía
-        self.mock_supabase.table().select().order().limit().execute.return_value.data = []
+        """Test obtener capital cuando no hay datos devuelve el inicial"""
+        # Configurar mock sin datos
+        self.mock_supabase.table.return_value.select.return_value.execute.return_value.data = []
         
         capital = self.risk_manager.get_capital_actual()
         
-        # Debería devolver capital inicial por defecto
-        self.assertEqual(capital, 100000.0)
+        self.assertEqual(capital, 200.0)  # Debe retornar capital inicial
+    
+    # ===== TESTS DE MÉTRICAS DEL DÍA =====
+    def test_get_metricas_dia_sin_trades(self):
+        """Test métricas cuando no hay trades en el día"""
+        # Configurar mock para la consulta de trades
+        mock_table = Mock()
+        mock_select = Mock()
+        mock_gte = Mock()
+        mock_execute = Mock()
         
-    def test_detectar_regimen_mercado_bull(self):
-        """Test detección de mercado alcista"""
-        # Mock datos de mercado alcista
-        mock_ticker = MagicMock()
-        mock_ticker.history.return_value = pd.DataFrame({
-            'Close': [100, 102, 104, 106, 108, 110]  # Tendencia alcista clara
-        })
-        self.mock_yf.Ticker.return_value = mock_ticker
+        mock_execute.return_value.data = []
+        mock_gte.return_value.execute = mock_execute
+        mock_select.return_value.gte = mock_gte
+        mock_table.return_value.select = mock_select
         
-        regimen = self.risk_manager.detectar_regimen_mercado('BTC-USD')
+        self.mock_supabase.table = mock_table
         
-        self.assertEqual(regimen, 'bull')
+        metricas = self.risk_manager.get_metricas_dia()
         
-    def test_detectar_regimen_mercado_bear(self):
-        """Test detección de mercado bajista"""
-        # Mock datos de mercado bajista
-        mock_ticker = MagicMock()
-        mock_ticker.history.return_value = pd.DataFrame({
-            'Close': [110, 108, 106, 104, 102, 100]  # Tendencia bajista clara
-        })
-        self.mock_yf.Ticker.return_value = mock_ticker
-        
-        regimen = self.risk_manager.detectar_regimen_mercado('BTC-USD')
-        
-        self.assertEqual(regimen, 'bear')
-        
-    def test_calcular_correlacion_real(self):
-        """Test cálculo de correlación real entre activos"""
-        # Mock datos de dos activos
-        mock_download = pd.DataFrame({
-            ('Close', 'BTC-USD'): [100, 102, 101, 103, 105],
-            ('Close', 'ETH-USD'): [2000, 2040, 2020, 2060, 2100]
-        })
-        mock_download.columns = pd.MultiIndex.from_tuples(mock_download.columns)
-        self.mock_yf.download.return_value = mock_download
-        
-        correlacion = self.risk_manager.calcular_correlacion_real('BTC-USD', 'ETH-USD')
-        
-        # Debería devolver un valor entre -1 y 1
-        self.assertGreaterEqual(correlacion, -1)
-        self.assertLessEqual(correlacion, 1)
-        
-    def test_calcular_correlacion_aproximada(self):
-        """Test cálculo de correlación aproximada"""
-        correlacion = self.risk_manager.calcular_correlacion_aproximada('BTC-USD', 'ETH-USD')
-        
-        # Para crypto similares, debería ser alta
-        self.assertGreater(correlacion, 0.5)
-        
-        # Para activos diferentes
-        correlacion = self.risk_manager.calcular_correlacion_aproximada('BTC-USD', 'GOLD')
-        self.assertLess(correlacion, 0.5)
-        
-    def test_calcular_var_historico(self):
-        """Test cálculo de Value at Risk histórico"""
-        # Mock datos históricos
-        mock_ticker = MagicMock()
-        returns = pd.Series(np.random.normal(-0.001, 0.02, 100))  # Retornos simulados
-        prices = pd.Series(100 * (1 + returns).cumprod())
-        mock_ticker.history.return_value = pd.DataFrame({'Close': prices})
-        self.mock_yf.Ticker.return_value = mock_ticker
-        
-        var_95 = self.risk_manager.calcular_var_historico(
-            symbol='BTC-USD',
-            monto=10000,
-            confianza=0.95
-        )
-        
-        # VaR debería ser negativo (pérdida potencial)
-        self.assertLess(var_95, 0)
-        # No debería ser más del 10% en condiciones normales
-        self.assertGreater(var_95, -1000)
-        
-    def test_verificar_horario_avanzado(self):
-        """Test verificación de horario de trading"""
-        # Mock diferentes horas
-        with patch('risk_management.risk_manager.datetime') as mock_datetime:
-            # Horario de trading normal (10 AM)
-            mock_datetime.now.return_value.time.return_value = time(10, 0)
-            mock_datetime.now.return_value.weekday.return_value = 1  # Martes
-            
-            puede_operar, mensaje = self.risk_manager.verificar_horario_avanzado()
-            self.assertTrue(puede_operar)
-            
-            # Fin de semana
-            mock_datetime.now.return_value.weekday.return_value = 6  # Domingo
-            
-            puede_operar, mensaje = self.risk_manager.verificar_horario_avanzado()
-            self.assertFalse(puede_operar)
-            self.assertIn("fin de semana", mensaje.lower())
-            
-    def test_ajustar_limites_dinamicamente(self):
-        """Test ajuste dinámico de límites según volatilidad"""
-        # Mock volatilidad alta
-        mock_ticker = MagicMock()
-        prices = pd.Series([100, 105, 98, 107, 95, 110])  # Alta volatilidad
-        mock_ticker.history.return_value = pd.DataFrame({'Close': prices})
-        self.mock_yf.Ticker.return_value = mock_ticker
-        
-        # Guardar límites originales
-        limite_original = self.risk_manager.max_riesgo_operacion
-        
-        # Ajustar límites
-        self.risk_manager.ajustar_limites_dinamicamente('BTC-USD')
-        
-        # Con alta volatilidad, debería reducir límites
-        self.assertLess(self.risk_manager.max_riesgo_operacion, limite_original)
-        
-    def test_evaluar_trade_avanzado_aprobado(self):
-        """Test evaluación de trade que debería ser aprobado"""
-        # Mock capital disponible
-        self.mock_supabase.table().select().order().limit().execute.return_value.data = [
-            {'balance': 100000.0}
+        self.assertEqual(metricas['trades_totales'], 0)
+        self.assertEqual(metricas['trades_ganadores'], 0)
+        self.assertEqual(metricas['trades_perdedores'], 0)
+        self.assertEqual(metricas['pnl_total'], 0)
+        self.assertEqual(metricas['pnl_porcentaje'], 0)
+        self.assertEqual(metricas['win_rate'], 0)
+    
+    def test_get_metricas_dia_con_trades_mixtos(self):
+        """Test métricas con trades ganadores y perdedores"""
+        # Configurar mock con trades
+        trades_data = [
+            {'id': 1, 'pnl': 10},      # Ganador
+            {'id': 2, 'pnl': -5},      # Perdedor
+            {'id': 3, 'pnl': 15},      # Ganador
+            {'id': 4, 'pnl': None},    # Sin cerrar
         ]
         
-        # Mock volatilidad normal
-        mock_ticker = MagicMock()
-        prices = pd.Series(np.random.normal(100, 1, 30))
-        mock_ticker.history.return_value = pd.DataFrame({'Close': prices})
-        self.mock_yf.Ticker.return_value = mock_ticker
+        mock_table = Mock()
+        mock_table.return_value.select.return_value.gte.return_value.execute.return_value.data = trades_data
+        self.mock_supabase.table = mock_table
         
-        # Mock horario válido
-        with patch('risk_management.risk_manager.datetime') as mock_datetime:
-            mock_datetime.now.return_value.time.return_value = time(10, 0)
-            mock_datetime.now.return_value.weekday.return_value = 1
-            
-            # Trade conservador
-            resultado = self.risk_manager.evaluar_trade_avanzado(
-                symbol='BTC-USD',
-                tipo='long',
-                monto=1000,  # 1% del capital
-                stop_loss=0.02  # 2% stop loss
-            )
-            
-            self.assertTrue(resultado['aprobar'])
-            self.assertIn('riesgo_total', resultado)
-            self.assertIn('var_95', resultado)
-            
-    def test_evaluar_trade_avanzado_rechazado_por_riesgo(self):
-        """Test evaluación de trade rechazado por alto riesgo"""
-        # Mock capital disponible
-        self.mock_supabase.table().select().order().limit().execute.return_value.data = [
-            {'balance': 100000.0}
+        metricas = self.risk_manager.get_metricas_dia()
+        
+        self.assertEqual(metricas['trades_totales'], 4)
+        self.assertEqual(metricas['trades_ganadores'], 2)
+        self.assertEqual(metricas['trades_perdedores'], 1)
+        self.assertEqual(metricas['pnl_total'], 20)  # 10 - 5 + 15
+        self.assertEqual(metricas['pnl_porcentaje'], 10.0)  # 20/200 * 100
+        self.assertEqual(metricas['win_rate'], 0.5)  # 2/4
+    
+    # ===== TESTS DE POSICIONES ABIERTAS =====
+    def test_get_posiciones_abiertas(self):
+        """Test obtener posiciones abiertas"""
+        posiciones_data = [
+            {'symbol': 'AAPL', 'quantity': 10, 'price': 150, 'status': 'OPEN'},
+            {'symbol': 'GOOGL', 'quantity': 5, 'price': 100, 'status': 'OPEN'}
         ]
         
-        # Trade muy riesgoso
-        resultado = self.risk_manager.evaluar_trade_avanzado(
-            symbol='BTC-USD',
-            tipo='long',
-            monto=30000,  # 30% del capital (muy alto)
-            stop_loss=0.05  # 5% stop loss
-        )
+        self.mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value.data = posiciones_data
         
-        self.assertFalse(resultado['aprobar'])
-        self.assertIn('excede', resultado['mensaje'].lower())
+        posiciones = self.risk_manager.get_posiciones_abiertas()
         
-    def test_generar_reporte_riesgo_avanzado(self):
-        """Test generación de reporte de riesgo completo"""
-        # Mock datos necesarios
-        self.mock_supabase.table().select().order().limit().execute.return_value.data = [
-            {'balance': 100000.0}
+        self.assertEqual(len(posiciones), 2)
+        self.assertEqual(posiciones[0]['symbol'], 'AAPL')
+        self.assertEqual(posiciones[1]['symbol'], 'GOOGL')
+    
+    # ===== TESTS DE EXPOSICIÓN =====
+    def test_calcular_exposicion_actual_sin_posiciones(self):
+        """Test calcular exposición sin posiciones abiertas"""
+        # Mock sin posiciones
+        self.mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []
+        
+        exposicion = self.risk_manager.calcular_exposicion_actual()
+        
+        self.assertEqual(exposicion['exposicion_total'], 0)
+        self.assertEqual(exposicion['exposicion_total_pct'], 0)
+        self.assertEqual(len(exposicion['exposicion_por_simbolo']), 0)
+        self.assertEqual(len(exposicion['simbolos_activos']), 0)
+    
+    def test_calcular_exposicion_actual_con_posiciones(self):
+        """Test calcular exposición con múltiples posiciones"""
+        # Mock con posiciones
+        posiciones_data = [
+            {'symbol': 'AAPL', 'quantity': 10, 'price': 150, 'status': 'OPEN'},  # $1500
+            {'symbol': 'GOOGL', 'quantity': 5, 'price': 100, 'status': 'OPEN'},  # $500
+            {'symbol': 'AAPL', 'quantity': 5, 'price': 140, 'status': 'OPEN'}   # $700
         ]
+        self.mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value.data = posiciones_data
         
-        # Mock posiciones abiertas
-        self.mock_supabase.table().select().eq().execute.return_value.data = [
-            {
-                'symbol': 'BTC-USD',
-                'entry_price': 50000,
-                'current_price': 51000,
-                'quantity': 0.1,
-                'type': 'long'
+        exposicion = self.risk_manager.calcular_exposicion_actual()
+        
+        # Total: 1500 + 500 + 700 = 2700
+        self.assertEqual(exposicion['exposicion_total'], 2700)
+        self.assertEqual(exposicion['exposicion_total_pct'], 13.5)  # 2700/200
+        
+        # Por símbolo
+        self.assertEqual(exposicion['exposicion_por_simbolo']['AAPL'], 2200)
+        self.assertEqual(exposicion['exposicion_por_simbolo']['GOOGL'], 500)
+        self.assertEqual(len(exposicion['simbolos_activos']), 2)
+    
+    # ===== TESTS DE CORRELACIÓN =====
+    def test_calcular_correlacion_mismo_sector_tech(self):
+        """Test correlación alta para mismo sector"""
+        corr = self.risk_manager.calcular_correlacion_aproximada('NVDA', 'AMD')
+        self.assertEqual(corr, 0.85)
+    
+    def test_calcular_correlacion_sectores_relacionados(self):
+        """Test correlación media para sectores relacionados"""
+        corr = self.risk_manager.calcular_correlacion_aproximada('MSFT', 'NET')
+        self.assertEqual(corr, 0.70)
+    
+    def test_calcular_correlacion_sectores_diferentes(self):
+        """Test correlación baja para sectores diferentes"""
+        corr = self.risk_manager.calcular_correlacion_aproximada('NVDA', 'SQ')
+        self.assertEqual(corr, 0.30)
+    
+    def test_calcular_correlacion_simbolos_desconocidos(self):
+        """Test correlación default para símbolos no mapeados"""
+        corr = self.risk_manager.calcular_correlacion_aproximada('XXX', 'YYY')
+        self.assertEqual(corr, 0.40)
+    
+    # ===== TESTS DE VERIFICACIÓN DE HORARIO =====
+    @patch('risk_manager.datetime')
+    def test_verificar_horario_trading_horario_valido(self, mock_datetime):
+        """Test horario válido de trading"""
+        # Configurar mock para martes 16:00
+        mock_now = Mock()
+        mock_now.hour = 16
+        mock_now.minute = 0
+        mock_now.weekday.return_value = 1  # Martes
+        mock_datetime.now.return_value = mock_now
+        
+        ok, mensaje = self.risk_manager.verificar_horario_trading()
+        
+        self.assertTrue(ok)
+        self.assertEqual(mensaje, "Horario óptimo para trading")
+    
+    @patch('risk_manager.datetime')
+    def test_verificar_horario_trading_fin_de_semana(self, mock_datetime):
+        """Test horario en fin de semana"""
+        # Configurar mock para sábado
+        mock_now = Mock()
+        mock_now.weekday.return_value = 5  # Sábado
+        mock_datetime.now.return_value = mock_now
+        
+        ok, mensaje = self.risk_manager.verificar_horario_trading()
+        
+        self.assertFalse(ok)
+        self.assertEqual(mensaje, "Mercado cerrado - Fin de semana")
+    
+    @patch('risk_manager.datetime')
+    def test_verificar_horario_trading_fuera_de_horario(self, mock_datetime):
+        """Test fuera del horario de trading"""
+        # Configurar mock para martes 23:00
+        mock_now = Mock()
+        mock_now.hour = 23
+        mock_now.weekday.return_value = 1  # Martes
+        mock_datetime.now.return_value = mock_now
+        
+        ok, mensaje = self.risk_manager.verificar_horario_trading()
+        
+        self.assertFalse(ok)
+        self.assertIn("Fuera de horario", mensaje)
+    
+    @patch('risk_manager.datetime')
+    def test_verificar_horario_trading_primera_hora(self, mock_datetime):
+        """Test primera hora del mercado cuando está configurado evitarla"""
+        # Configurar mock para martes 15:30
+        mock_now = Mock()
+        mock_now.hour = 15
+        mock_now.minute = 30
+        mock_now.weekday.return_value = 1
+        mock_datetime.now.return_value = mock_now
+        
+        self.risk_manager.evitar_primera_hora = True
+        ok, mensaje = self.risk_manager.verificar_horario_trading()
+        
+        self.assertFalse(ok)
+        self.assertEqual(mensaje, "Primera hora del mercado - Alta volatilidad")
+    
+    # ===== TESTS DE FACTOR DE AJUSTE DINÁMICO =====
+    def test_calcular_factor_ajuste_dinamico_sin_perdidas(self):
+        """Test factor de ajuste cuando no hay pérdidas"""
+        with patch.object(self.risk_manager, 'get_metricas_dia') as mock_metricas:
+            mock_metricas.return_value = {
+                'pnl_porcentaje': 1.0,
+                'trades_totales': 3,
+                'win_rate': 0.6
             }
-        ]
+            
+            factor = self.risk_manager.calcular_factor_ajuste_dinamico()
+            
+            self.assertEqual(factor, 1.0)
+    
+    def test_calcular_factor_ajuste_dinamico_con_perdidas_pequenas(self):
+        """Test factor de ajuste con pérdidas pequeñas"""
+        with patch.object(self.risk_manager, 'get_metricas_dia') as mock_metricas:
+            mock_metricas.return_value = {
+                'pnl_porcentaje': -1.5,
+                'trades_totales': 4,
+                'win_rate': 0.5
+            }
+            
+            factor = self.risk_manager.calcular_factor_ajuste_dinamico()
+            
+            self.assertEqual(factor, 0.75)
+    
+    def test_calcular_factor_ajuste_dinamico_con_perdidas_grandes(self):
+        """Test factor de ajuste con pérdidas grandes"""
+        with patch.object(self.risk_manager, 'get_metricas_dia') as mock_metricas:
+            mock_metricas.return_value = {
+                'pnl_porcentaje': -2.5,
+                'trades_totales': 5,
+                'win_rate': 0.2
+            }
+            
+            factor = self.risk_manager.calcular_factor_ajuste_dinamico()
+            
+            # 0.5 por pérdidas * 0.7 por win rate = 0.35
+            self.assertAlmostEqual(factor, 0.35, places=2)
+    
+    def test_calcular_factor_ajuste_dinamico_con_muchos_trades(self):
+        """Test factor de ajuste cuando ya se hicieron muchos trades"""
+        with patch.object(self.risk_manager, 'get_metricas_dia') as mock_metricas:
+            mock_metricas.return_value = {
+                'pnl_porcentaje': 0.5,
+                'trades_totales': 12,
+                'win_rate': 0.6
+            }
+            
+            factor = self.risk_manager.calcular_factor_ajuste_dinamico()
+            
+            self.assertEqual(factor, 0.8)  # Reducción por muchos trades
+    
+    # ===== TESTS DE STOP LOSS DINÁMICO =====
+    def test_calcular_stop_loss_dinamico_buy(self):
+        """Test cálculo de stop loss para compra"""
+        resultado = self.risk_manager.calcular_stop_loss_dinamico('AAPL', 100, 'BUY', 0.02)
         
-        # Generar reporte
-        reporte = self.risk_manager.generar_reporte_riesgo_avanzado()
+        # Para BUY, stop loss debe ser menor que precio
+        self.assertLess(resultado['stop_loss'], 100)
+        self.assertGreaterEqual(resultado['stop_loss'], 98)
         
-        # Verificar estructura del reporte
-        self.assertIn('fecha', reporte)
-        self.assertIn('capital_actual', reporte)
-        self.assertIn('exposicion_total', reporte)
-        self.assertIn('posiciones_abiertas', reporte)
-        self.assertIn('regime_mercado', reporte)
-        self.assertIn('metricas_riesgo', reporte)
+        # Take profit debe ser mayor
+        self.assertGreater(resultado['take_profit'], 100)
         
-        # Verificar que las métricas tienen valores
-        self.assertIsNotNone(reporte['capital_actual'])
-        self.assertEqual(reporte['regime_mercado'], self.risk_manager.market_regime)
+        # Verificar ratio
+        self.assertEqual(resultado['riesgo_beneficio'], 1.5)
+    
+    def test_calcular_stop_loss_dinamico_sell(self):
+        """Test cálculo de stop loss para venta"""
+        resultado = self.risk_manager.calcular_stop_loss_dinamico('AAPL', 100, 'SELL', 0.02)
+        
+        # Para SELL, stop loss debe ser mayor que precio
+        self.assertGreater(resultado['stop_loss'], 100)
+        self.assertLessEqual(resultado['stop_loss'], 102)
+        
+        # Take profit debe ser menor
+        self.assertLess(resultado['take_profit'], 100)
+        
+        # Verificar ratio
+        self.assertEqual(resultado['riesgo_beneficio'], 1.5)
 
 
-class TestRiskManagerIntegrationScenarios(unittest.TestCase):
-    """Tests de escenarios de integración"""
+class TestEvaluarTradeCompleto(unittest.TestCase):
+    """Tests específicos para el método evaluar_trade_completo"""
     
     def setUp(self):
-        """Setup para tests de integración"""
-        # Configurar mocks
-        sys.modules['supabase'].create_client.return_value = MagicMock()
-        from risk_management.risk_manager import EnhancedRiskManager
-        self.risk_manager = EnhancedRiskManager()
+        """Configuración para tests de evaluar_trade_completo"""
+        self.mock_supabase = Mock()
+        self.patcher = patch('risk_manager.supabase', self.mock_supabase)
+        self.patcher.start()
         
-    def test_escenario_volatilidad_extrema(self):
-        """Test comportamiento en volatilidad extrema"""
-        # Simular volatilidad extrema
-        with patch.object(self.risk_manager, 'calcular_var_historico') as mock_var:
-            mock_var.return_value = -5000  # VaR muy alto (5% del portfolio)
-            
-            # El sistema debería rechazar trades
-            resultado = self.risk_manager.evaluar_trade_avanzado(
-                'BTC-USD', 'long', 10000, 0.02
-            )
-            
-            self.assertFalse(resultado['aprobar'])
-            
-    def test_escenario_cambio_regimen_mercado(self):
-        """Test adaptación a cambio de régimen de mercado"""
-        # Empezar en bull
-        self.risk_manager.market_regime = 'bull'
-        limite_bull = self.risk_manager.max_riesgo_operacion
+        # Capital por defecto
+        self.mock_supabase.table.return_value.select.return_value.execute.return_value.data = [
+            {'capital': 1000}
+        ]
         
-        # Cambiar a bear
-        with patch.object(self.risk_manager, 'detectar_regimen_mercado') as mock_regime:
-            mock_regime.return_value = 'bear'
-            self.risk_manager.market_regime = 'bear'
-            self.risk_manager.ajustar_limites_dinamicamente('BTC-USD')
+        self.risk_manager = RiskManager(capital_inicial=1000)
+    
+    def tearDown(self):
+        self.patcher.stop()
+    
+    @patch('risk_manager.datetime')
+    def test_evaluar_trade_rechazado_por_horario(self, mock_datetime):
+        """Test trade rechazado por estar fuera de horario"""
+        # Configurar fin de semana
+        mock_now = Mock()
+        mock_now.weekday.return_value = 6  # Domingo
+        mock_datetime.now.return_value = mock_now
+        
+        aprobado, mensaje, ajustes = self.risk_manager.evaluar_trade_completo(
+            'AAPL', 'BUY', 10, 150, 0.8, 'Consenso fuerte'
+        )
+        
+        self.assertFalse(aprobado)
+        self.assertIn("Mercado cerrado", mensaje)
+    
+    def test_evaluar_trade_rechazado_por_perdida_diaria(self):
+        """Test trade rechazado por límite de pérdida diaria"""
+        # Mock métricas con pérdidas altas
+        with patch.object(self.risk_manager, 'get_metricas_dia') as mock_metricas:
+            mock_metricas.return_value = {
+                'pnl_porcentaje': -6.0,  # Más del 5%
+                'trades_totales': 10
+            }
             
-            # Límites deberían ser más conservadores en bear
-            self.assertLess(self.risk_manager.max_riesgo_operacion, limite_bull)
+            with patch.object(self.risk_manager, 'verificar_horario_trading') as mock_horario:
+                mock_horario.return_value = (True, "OK")
+                
+                aprobado, mensaje, ajustes = self.risk_manager.evaluar_trade_completo(
+                    'AAPL', 'BUY', 10, 150, 0.8, 'Consenso fuerte'
+                )
+                
+                self.assertFalse(aprobado)
+                self.assertIn("Límite de pérdida diaria", mensaje)
 
 
 if __name__ == '__main__':
-    unittest.main(verbosity=2)
+    unittest.main()
