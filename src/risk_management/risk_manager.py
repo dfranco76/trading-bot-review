@@ -1,5 +1,5 @@
 # risk_manager_enhanced.py
-from config import SUPABASE_URL, SUPABASE_KEY
+from utils.config import SUPABASE_URL, SUPABASE_KEY
 from supabase import create_client
 from datetime import datetime, timedelta
 from typing import Dict, Tuple, List, Optional

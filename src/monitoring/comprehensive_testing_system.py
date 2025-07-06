@@ -111,11 +111,11 @@ class TradingSystemTester:
         
         # Test 1: Inicialización de agentes
         try:
-            from agente_momentum import AgenteMomentum
-            from agente_mean_reversion import AgenteMeanReversion
-            from agente_pattern_recognition import AgentePatternRecognition
-            from agente_volume_momentum import AgenteVolumeMomentum
-            from agente_sentiment import AgenteSentiment
+            from strategies.agente_momentum import AgenteMomentum
+            from strategies.agente_mean_reversion import AgenteMeanReversion
+            from strategies.agente_pattern_recognition import AgentePatternRecognition
+            from strategies.agente_volume_momentum import AgenteVolumeMomentum
+            from strategies.agente_sentiment import AgenteSentiment
             
             agents = [
                 AgenteMomentum(),
@@ -175,8 +175,8 @@ class TradingSystemTester:
         results = {'total': 0, 'passed': 0, 'failed': 0, 'details': []}
         
         try:
-            from risk_manager import RiskManager
-            rm = RiskManager()
+            from risk_management.risk_manager import EnhancedRiskManager
+            rm = EnhancedEnhancedRiskManager()
             
             # Test 1: Límites de pérdida diaria
             results['total'] += 1
@@ -232,7 +232,7 @@ class TradingSystemTester:
             {'agent': 'A5', 'action': 'BUY', 'confidence': 0.75, 'reason': 'Test'}
         ]
         
-        from sistema_multiagente import SistemaMultiAgente
+        from strategies.sistema_multiagente import SistemaMultiAgente
         sistema = SistemaMultiAgente()
         consenso = sistema.calcular_consenso_profesional(votos_unanime)
         
@@ -403,7 +403,7 @@ class TradingSystemTester:
         results = {'total': 0, 'passed': 0, 'failed': 0, 'details': []}
         
         try:
-            from ml_prediction_system import MLPredictionSystem
+            from strategies.ml_prediction_system import MLPredictionSystem
             ml_system = MLPredictionSystem()
             
             # Test 1: Feature engineering
@@ -459,7 +459,7 @@ class TradingSystemTester:
         # Edge case 1: Precio cero o negativo
         results['total'] += 1
         try:
-            from sistema_multiagente import SistemaMultiAgente
+            from strategies.sistema_multiagente import SistemaMultiAgente
             sistema = SistemaMultiAgente()
             
             # Simular decisión con precio 0
@@ -494,8 +494,8 @@ class TradingSystemTester:
             }
             
             # Risk manager debe rechazar
-            from risk_manager import RiskManager
-            rm = RiskManager()
+            from risk_management.risk_manager import EnhancedRiskManager
+            rm = EnhancedEnhancedRiskManager()
             aprobado, _, _ = rm.evaluar_trade_completo(
                 'TEST', 'BUY', 1000000, 100, 0.8, 'Test'
             )
@@ -544,7 +544,7 @@ class TradingSystemTester:
         trades_processed = 0
         
         try:
-            from sistema_multiagente import SistemaMultiAgente
+            from strategies.sistema_multiagente import SistemaMultiAgente
             sistema = SistemaMultiAgente()
             
             # Simular 100 análisis rápidos

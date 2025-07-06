@@ -1,6 +1,6 @@
 # src/broker_integration.py
 import alpaca_trade_api as tradeapi
-from config import ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL
+from utils.config import ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL
 from datetime import datetime
 import time
 

@@ -1,5 +1,5 @@
 # src/sistema_multiagente.py
-from config import SUPABASE_URL, SUPABASE_KEY, SYMBOLS
+from utils.config import SUPABASE_URL, SUPABASE_KEY, SYMBOLS
 from supabase import create_client
 import yfinance as yf
 from datetime import datetime
@@ -8,16 +8,16 @@ import numpy as np
 import json
 
 # Importar TODOS los agentes especializados
-from agente_momentum import AgenteMomentum
-from agente_mean_reversion import AgenteMeanReversion
-from agente_pattern_recognition import AgentePatternRecognition
-from agente_volume_momentum import AgenteVolumeMomentum
-from agente_sentiment import AgenteSentiment
+from strategies.agente_momentum import AgenteMomentum
+from strategies.agente_mean_reversion import AgenteMeanReversion
+from strategies.agente_pattern_recognition import AgentePatternRecognition
+from strategies.agente_volume_momentum import AgenteVolumeMomentum
+from strategies.agente_sentiment import AgenteSentiment
 
 # Intentar importar Claude (opcional)
 try:
-    from claude_mentor import ClaudeIntegration
-    from config import ANTHROPIC_API_KEY, MAX_TRADE_SIZE
+    from utils.claude_mentor import ClaudeIntegration
+    from utils.config import ANTHROPIC_API_KEY, MAX_TRADE_SIZE
     CLAUDE_AVAILABLE = True
 except ImportError:
     CLAUDE_AVAILABLE = False

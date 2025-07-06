@@ -1,5 +1,5 @@
 # src/agente_sentiment.py
-from config import SUPABASE_URL, SUPABASE_KEY, NEWSAPI_KEY
+from utils.config import SUPABASE_URL, SUPABASE_KEY, NEWSAPI_KEY
 from supabase import create_client, Client
 import yfinance as yf
 from datetime import datetime, timedelta
@@ -488,7 +488,7 @@ if __name__ == "__main__":
     agente = AgenteSentiment()
     
     # Símbolos a analizar
-    from config import SYMBOLS
+    from utils.config import SYMBOLS
     
     # Ejecutar análisis
     agente.run_cycle(SYMBOLS)

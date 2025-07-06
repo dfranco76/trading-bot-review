@@ -1,8 +1,8 @@
 # src/main_bot.py - Versión con menú mejorado
 
-from config import SYMBOLS
-from sistema_multiagente import SistemaMultiAgente
-from risk_manager import RiskManager
+from utils.config import SYMBOLS
+from strategies.sistema_multiagente import SistemaMultiAgente
+from risk_management.risk_manager import EnhancedRiskManager
 import time
 from datetime import datetime
 import schedule
@@ -21,7 +21,7 @@ class TradingBotProfesional:
         
         # Inicializar componentes
         print("\n⚙️ Inicializando componentes...")
-        self.risk_manager = RiskManager()
+        self.risk_manager = EnhancedEnhancedRiskManager()
         self.sistema_multiagente = SistemaMultiAgente()
         
         print("\n✅ Bot profesional listo para operar")

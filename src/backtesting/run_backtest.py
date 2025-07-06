@@ -11,11 +11,11 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Importar los agentes
-from agente_momentum import AgenteMomentum
-from agente_mean_reversion import AgenteMeanReversion
-from agente_pattern_recognition import AgentePatternRecognition
-from agente_volume_momentum import AgenteVolumeMomentum
-from agente_sentiment import AgenteSentiment
+from strategies.agente_momentum import AgenteMomentum
+from strategies.agente_mean_reversion import AgenteMeanReversion
+from strategies.agente_pattern_recognition import AgentePatternRecognition
+from strategies.agente_volume_momentum import AgenteVolumeMomentum
+from strategies.agente_sentiment import AgenteSentiment
 
 class BacktestEngine:
     def __init__(self, initial_capital: float = 10000):

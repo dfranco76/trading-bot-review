@@ -2,7 +2,7 @@
 """
 Sistema de gestión activa de trades con stop loss y take profit automáticos
 """
-from config import SUPABASE_URL, SUPABASE_KEY
+from utils.config import SUPABASE_URL, SUPABASE_KEY
 from supabase import create_client
 import yfinance as yf
 from datetime import datetime

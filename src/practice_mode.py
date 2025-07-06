@@ -4,9 +4,9 @@
 import sys
 sys.path.insert(0, 'src')
 
-from config import SYMBOLS
-from sistema_multiagente import SistemaMultiAgente
-from risk_manager import RiskManager
+from utils.config import SYMBOLS
+from strategies.sistema_multiagente import SistemaMultiAgente
+from risk_management.risk_manager import EnhancedRiskManager
 from datetime import datetime
 
 class ModoPractica:
@@ -20,7 +20,7 @@ class ModoPractica:
         
         # Crear sistema
         print("\n⚙️ Inicializando sistema...")
-        self.risk_manager = RiskManager()
+        self.risk_manager = EnhancedEnhancedRiskManager()
         self.sistema = SistemaMultiAgente()
         
         # Modificar para no ejecutar trades reales

@@ -3,8 +3,8 @@ import sys
 import os
 sys.path.insert(0, 'src')
 
-from sistema_multiagente import SistemaMultiAgente
-from risk_manager import RiskManager
+from strategies.sistema_multiagente import SistemaMultiAgente
+from risk_management.risk_manager import EnhancedRiskManager
 from datetime import datetime
 import time
 
@@ -18,7 +18,7 @@ class SafeTradingWrapper:
         """
         self.modo = modo
         self.sistema = SistemaMultiAgente()
-        self.risk_manager = RiskManager()
+        self.risk_manager = EnhancedEnhancedRiskManager()
         
         # Límites según modo
         self.limites = {
@@ -85,7 +85,7 @@ class SafeTradingWrapper:
             print(f"  ✅ [DEMO] Trade simulado")
             # Registrar en paper trading reporter
             try:
-                from paper_trading_reporter import reporter
+                from monitoring.paper_trading_reporter import reporter
                 reporter.registrar_trade(decision)
             except:
                 pass
@@ -177,7 +177,7 @@ class SafeTradingWrapper:
 
 def dia1_validacion():
     """Lunes - Solo validación"""
-    from config import SYMBOLS
+    from utils.config import SYMBOLS
     
     print("\n🟦 DÍA 1 - VALIDACIÓN")
     print("="*60)
@@ -194,7 +194,7 @@ def dia1_validacion():
 
 def dia2_paper_trading():
     """Paper trading intensivo"""
-    from config import SYMBOLS
+    from utils.config import SYMBOLS
     
     print("\n🟨 PAPER TRADING INTENSIVO")
     print("="*60)
@@ -211,7 +211,7 @@ def dia2_paper_trading():
 
 def dia3_micro_test():
     """Test con 20€"""
-    from config import SYMBOLS
+    from utils.config import SYMBOLS
     
     print("\n🟧 MICRO TEST (20€ máx)")
     print("="*60)
@@ -227,7 +227,7 @@ def dia3_micro_test():
 
 def dia4_trading_real():
     """Trading real con 200€"""
-    from config import SYMBOLS
+    from utils.config import SYMBOLS
     
     print("\n🟥 TRADING REAL (200€)")
     print("="*60)
